@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+option go_package = "event";
+
+package github.com.kubnix.skipper.protos.event;
+
+import "timestamp.proto";
+
+service EventSvc {
+    rpc Watch(WatchRequest) returns (stream Event){}
+}
+
+message Event {
+    string id = 1;
+    string resource_id = 2;
+    ResourceType resource_type = 3;
+    EventType event_type = 4;
+    bytes data = 5;
+    google.protobuf.Timestamp created_at = 6;
+}
+
+message WatchRequest {
+    EventType event_type = 1;
+    ResourceType resource_type = 2;
+
+    // Every consumer when it connects to a stream of events will specify
+    // how old the events returned should be (by default 5m).
+    int32 old_events_time_span = 3; // needs a better name
+}
+
+enum ResourceType {
+    TEMPLATE = 0;
+    HARDWARE = 1;
+    WORKFLOW = 2;
+}
+
+enum EventType {
+    CREATED = 0;
+    UPDATED = 1;
+    DELETED = 2;
+    WORKFLOW_INPROGRESS = 3;
+    WORKFLOW_FAILED = 4;
+    WORKFLOW_TIMEOUT = 5;
+    WORKFLOW_SUCCESS = 6;
+    WORKFLOW_COMPLETED = 7;
+}
+
+
